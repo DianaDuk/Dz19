@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+            background-color: #4A90E2;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #weather-widget {
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            width: 350px;
+        }
+        #date {
+            font-size: 18px;
+        }
+        #time {
+            font-size: 60px;
+            margin: 20px 0;
+        }
+        #temp {
+            font-size: 36px;
+        }
+        #weather {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+        #refresh {
+            margin-top: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="weather-widget">
+        <h2 id="date"></h2>
+        <div id="time"></div>
+        <div id="temp"></div>
+        <div id="weather"></div>
+        <div id="humidity"></div>
+        <div id="pressure"></div>
+        <div id="wind"></div>
+        <button id="refresh">Оновити</button>
+    </div>
+
+    <script>
+        const APIkey = '132e04cd2e82e3651223716de5933654';
+        const city = 'Dnipro';
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${APIkey}&units=metric&lang=uk`;
+
+        async function fetchWeather() {
+            try{
+                const response = await fetch(url);
+                if(!response.ok){
+                    throw new Error('Неможливо отримати дані з API');
+                }
+                const data = await response.json();
+                updateWeatherWidget(data);
+            } catch(error){
+                console.error('Помилка', error);
+            }
+        }
+
+        function updateWeatherWidget(data){
+            const date = new Date();
+            document.getElementById('date').textContent = date.toDateString();
+            document.getElementById('time').textContent = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('temp').textContent = `${Math.round(data.main.temp)}°C`;
+            document.getElementById('weather').textContent = `${data.weather[0].description.charAt(0).toUpperCase() + data.weather[0].description.slice(1)}`;
+            document.getElementById('humidity').textContent = `Вологість: ${data.main.humidity}%`;
+            document.getElementById('pressure').textContent = `Тиск: ${data.main.pressure} hPa`;
+            document.getElementById('wind').textContent = `Вітер: ${data.wind.speed} км/год`;
+        }
+        document.getElementById('refresh').addEventListener('click', fetchWeather);
+
+        fetchWeather();
+    </script>
+</body>
+</html>
